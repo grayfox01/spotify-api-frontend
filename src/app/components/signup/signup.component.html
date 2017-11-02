@@ -1,0 +1,43 @@
+<div class="row justify-content-md-center justify-content-sm-center">
+  <div class="card col-sm-8" *ngIf="user">
+    <div class="card-body">
+      <h4 class="card-title">Registro</h4>
+      <div class="card-body">
+        <div *ngIf="(user.access_token || user.refresh_token)">
+          <div class="form-group">
+            <label>id</label>
+            <input type="text"  readonly class="form-control"  [(ngModel)]="user.id" #ctrl="ngModel" required placeholder="Enter your first name">
+          </div>
+          <div class="form-group">
+            <label>Nombre</label>
+            <input type="text" readonly class="form-control"  [(ngModel)]="user.display_name" #ctrl="ngModel" required placeholder="Enter your first name">
+          </div>
+          <div class="form-group">
+            <label>Pais</label>
+            <input type="text"  readonly class="form-control" [(ngModel)]="user.country" #ctrl="ngModel" required placeholder="Enter your last name">
+          </div>
+          <div class="form-group">
+            <label>Uri</label>
+            <input type="text"  readonly class="form-control" [(ngModel)]="user.uri" #ctrl="ngModel" required placeholder="Enter your last name">
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" readonly class="form-control" [(ngModel)]="user.email" #ctrl="ngModel" required aria-describedby="emailHelp" placeholder="Enter email">
+            <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" class="form-control" [(ngModel)]="user.password" #ctrl="ngModel" required placeholder="Password">
+          </div>
+          <button (click)="signUp()" class="btn btn-primary">Register</button>
+        </div>
+        <div *ngIf="!(user.access_token || user.refresh_token)">
+             <a class="btn btn-primary" href="http://localhost:3000/v1/auth/signup">Registrarme con spotify</a>
+        </div>
+        <div *ngIf="loading">
+             Cargando perfil desde spotify por favor espere...
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

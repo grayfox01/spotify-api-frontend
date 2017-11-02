@@ -1,0 +1,33 @@
+<div class="row justify-content-md-center justify-content-sm-center">
+  <div class="card col-sm-8">
+    <div class="card-body">
+      <h4 class="card-title">Lista de playlists</h4>
+      <div class="row">
+        <div class="col-sm-12">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Imagen</th>
+              <th scope="col">Nombre</th>
+              <th scope="col">Propietario</th>
+              <th scope="col">Total canciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of playlists.items;let i = index">
+              <th scope="row">{{i}}</th>
+              <td>
+                <img [src]="item.images[0].url" class="img-fluid img-thumbnail" style="width:100px;"/>
+              </td>
+              <td>{{item.name}}</td>
+              <td>{{item.owner.display_name}}</td>
+              <td>{{item.tracks.total}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      </div>
+    </div>
+  </div>
+</div>
