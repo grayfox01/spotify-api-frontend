@@ -12,6 +12,7 @@
               <th scope="col">Nombre</th>
               <th scope="col">Propietario</th>
               <th scope="col">Total canciones</th>
+              <th scope="col">Ver</th>
             </tr>
           </thead>
           <tbody>
@@ -23,6 +24,11 @@
               <td>{{item.name}}</td>
               <td>{{item.owner.display_name}}</td>
               <td>{{item.tracks.total}}</td>
+              <td>
+                <a [routerLink]="['/playlist', item.id]" class="btn btn-light">
+                  <i  class="fa fa-folder-open" aria-hidden="true"></i>
+                </a>
+              </td>
             </tr>
           </tbody>
         </table>

@@ -1,23 +1,19 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AuthenticationService } from './../../services/authentication.service';
 import { UsersService } from './../../services/users.service';
 
-
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  selector: 'app-callback',
+  templateUrl: './callback.component.html',
+  styleUrls: ['./callback.component.css']
 })
-export class LoginComponent implements OnInit {
-
-  public user: any = {};
+export class CallbackComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private authenticationService: AuthenticationService,
-    private usersService: UsersService) { }
+    private usersService: UsersService
+  ) { }
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
@@ -29,26 +25,12 @@ export class LoginComponent implements OnInit {
              localStorage.setItem("user",JSON.stringify({id:data.data.id,token:params.token}));
              this.router.navigate(["/home"]);
            }else{
-             console.log(data);
+             this.router.navigate(["/restricted"]);
            }
         }, error => {
 
         });
       }
-    });
-  }
-
-  login() {
-    this.authenticationService.login(this.user).subscribe(data => {
-      if (data.error) {
-        console.log(data);
-      } else {
-        console.log(data);
-        localStorage.setItem('user', JSON.stringify(data.data));
-        this.router.navigate(['/home']);
-      }
-    }, error => {
-      console.log(error);
     });
   }
 

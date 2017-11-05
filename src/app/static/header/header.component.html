@@ -16,10 +16,7 @@
         <a class="nav-link" routerLink="/playlists" routerLinkActive="active">Playlist</a>
       </li>
       <li class="nav-item" *ngIf="!loged()">
-        <a class="nav-link" routerLink="/login" routerLinkActive="active">Log in</a>
-      </li>
-      <li class="nav-item" *ngIf="!loged()">
-        <a class="nav-link" href="http://localhost:3000/v1/auth/signup">Sing up</a>
+        <a class="nav-link"  href="http://localhost:3000/v1/auth/authorize">Log in</a>
       </li>
       <li class="nav-item" *ngIf="loged()">
         <a class="nav-link" (click)="logOut()">log Out</a>
