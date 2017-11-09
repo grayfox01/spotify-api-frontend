@@ -14,8 +14,7 @@ export class AuthenticatedGuard implements CanActivate {
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
 
-        console.log(this.authenticationService.isAuthed());
-      if (this.authenticationService.isAuthed()) {
+      if (this.authenticationService.getUser()) {
         return true;
       } else {
         this.router.navigate(["/restricted"]);

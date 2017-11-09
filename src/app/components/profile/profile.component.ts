@@ -13,8 +13,6 @@ export class ProfileComponent implements OnInit {
 
   public user:any = {};
   public edit:boolean;
-  public newPassword:string;
-  public editPassword:boolean;
 
   constructor(
       private route: ActivatedRoute,
@@ -23,7 +21,7 @@ export class ProfileComponent implements OnInit {
       private authenticationService:AuthenticationService) {}
 
     ngOnInit() {
-      this.init();
+      this.user = this.authenticationService.getUser();
     }
 
     ngOnDestroy() {
@@ -44,28 +42,18 @@ export class ProfileComponent implements OnInit {
     }
 
     guardar(){
-      if(this.editPassword){
-        this.user.password = this.newPassword;
-      }
       this.usersService.editProfile(this.user).subscribe(data=>{
          console.log(data.data);
-         this.init();
+         this.authenticationService.setUser(this.user);
+         this.edit = false;
       },error=>{
          console.log(error);
       });
     }
 
-    init(){
+    cancelar(){
       this.edit = false;
-      this.editPassword = false;
-      this.newPassword = null;
-      let user = JSON.parse(localStorage.getItem('user'));
-      this.usersService.profile(user.id,user.token).subscribe(data=>{
-         console.log(data);
-         this.user = data.data;
-      },error=>{
-         console.log(error);
-      });
+      this.user = this.authenticationService.getUser();
     }
 
 }

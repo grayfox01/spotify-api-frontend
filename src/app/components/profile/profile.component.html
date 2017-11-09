@@ -25,21 +25,12 @@
             <input type="email" readonly class="form-control" [(ngModel)]="user.email" #ctrl="ngModel" required aria-describedby="emailHelp" placeholder="Enter email">
             <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
           </div>
-          <div *ngIf="edit" class="form-check">
-            <label class="form-check-label">
-              <input class="form-check-input" type="checkbox" [(ngModel)]="editPassword">Editar password
-            </label>
-          </div>
-          <div *ngIf="editPassword" class="form-group">
-            <label>Password</label>
-            <input  type="password" class="form-control" [(ngModel)]="newPassword" #ctrl="ngModel" required placeholder="Password">
-          </div>
         </div>
       </div>
       <button *ngIf="!edit" (click)="editar()" class="btn btn-primary">Editar</button>
       <button *ngIf="!edit" class="btn btn-danger" (click)="eliminar()">Eliminar mi cuenta</button>
       <button *ngIf="edit" (click)="guardar()" class="btn btn-success">Guardar</button>
-      <button *ngIf="edit" class="btn btn-danger" (click)="init()">Cancelar</button>
+      <button *ngIf="edit" class="btn btn-danger" (click)="cancelar()">Cancelar</button>
     </div>
   </div>
 </div>

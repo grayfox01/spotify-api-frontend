@@ -1,6 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UsersService } from './../../services/users.service';
+import { AuthenticationService } from './../../services/authentication.service';
+
 
 @Component({
   selector: 'app-callback',
@@ -12,18 +14,17 @@ export class CallbackComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private usersService: UsersService
+    private usersService: UsersService,
+    private authenticationService:AuthenticationService
   ) { }
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
-      if (params.id &&
-        params.token) {
-        this.usersService.profile(params.id, params.token).subscribe(data => {
+      if(params){
+        this.usersService.verifyProfile(params).subscribe(data => {
            if(data.error == false){
              console.log(data);
-             localStorage.setItem("user",JSON.stringify({id:data.data.id,token:params.token}));
-             this.router.navigate(["/home"]);
+             this.authenticationService.login(params);
            }else{
              this.router.navigate(["/restricted"]);
            }

@@ -7,19 +7,16 @@ import { Subject }    from 'rxjs/Subject';
 
 @Injectable()
 export class AuthenticationService {
-  private BASE_URL: string = 'http://localhost:3000/v1/auth';
 
   constructor(public http: Http,public router:Router) { }
 
   login(user:any){
-    let url: string = `${this.BASE_URL}/login`;
-    return this.http.post(url,user).map((response: Response) => {
-      try {
-        return response.json() || response.status;
-      } catch (e) {
-        return response.status;
-      }
-    });
+    this.setUser(user);
+    this.router.navigate(['/home']);
+  }
+
+  setUser(user:any){
+    localStorage.setItem('user',JSON.stringify(user));
   }
 
   logOut(){
@@ -27,28 +24,13 @@ export class AuthenticationService {
     this.router.navigate(['/home']);
   }
 
-  singUp(user:any){
-    let url: string = `${this.BASE_URL}/signup`;
-    return this.http.post(url,user).map((response: Response) => {
-      try {
-        return response.json() || response.status;
-      } catch (e) {
-        return response.status;
-      }
-    });
-  }
-
-    getHeaders(){
-      let token = JSON.parse(localStorage.getItem('user')).token;
-      let headers: Headers = new Headers({
-        'Content-Type': 'application/json',
-         Authorization: `Bearer ${token}`
-      });
-      return headers;
+  getUser(){
+    let user = localStorage.getItem('user');
+    if(user){
+      return JSON.parse(user);
+    }else{
+      return undefined;
     }
-
-  isAuthed(){
-    return (localStorage.getItem('user')!= undefined && localStorage.getItem('user')!= null)? true:false;
   }
 
 }

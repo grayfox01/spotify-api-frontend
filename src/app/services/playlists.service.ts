@@ -4,18 +4,23 @@ import {Observable} from 'rxjs/Observable';
 import 'rxjs/Rx';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subject }    from 'rxjs/Subject';
+import { AuthenticationService } from './authentication.service';
 
 @Injectable()
 export class PlaylistsService {
 
   private BASE_URL: string = 'http://localhost:3000/v1/playlists';
 
-  constructor(public http: Http,public router:Router) { }
+  constructor(public http: Http,public router:Router,public authenticationService:AuthenticationService) { }
 
   getAll(){
-    let user = JSON.parse(localStorage.getItem('user'));
-    let url: string = `${this.BASE_URL}/userId/${user.id}/playlists`;
-    return this.http.get(url,{ headers: this.getHeaders()}).map((response: Response) => {
+    let user = this.authenticationService.getUser();
+    let body:any = {};
+    body.id = user.id;
+    body.access_token = user.access_token;
+    body.refresh_token = user.refresh_token;
+    let url: string = `${this.BASE_URL}`;
+    return this.http.get(url,{ headers: this.getHeaders(user,body)}).map((response: Response) => {
       try {
         return response.json() || response.status;
       } catch (e) {
@@ -25,9 +30,13 @@ export class PlaylistsService {
   }
 
   getId(id:string){
-    let user = JSON.parse(localStorage.getItem('user'));
-    let url: string = `${this.BASE_URL}/userId/${user.id}/playlists/${id}`;
-    return this.http.get(url,{ headers: this.getHeaders()}).map((response: Response) => {
+    let user = this.authenticationService.getUser();
+    let body:any = {};
+    body.id = user.id;
+    body.access_token = user.access_token;
+    body.refresh_token = user.refresh_token;
+    let url: string = `${this.BASE_URL}/${id}`;
+    return this.http.get(url,{ headers: this.getHeaders(user,body)}).map((response: Response) => {
       try {
         return response.json() || response.status;
       } catch (e) {
@@ -37,15 +46,14 @@ export class PlaylistsService {
   }
 
   removeRepeatedsTracks(id,tracks:any){
-    let user = JSON.parse(localStorage.getItem('user'));
-    let headers: Headers = new Headers({
-      'Content-Type': 'application/json',
-       Authorization: `Bearer ${user.token}`,
-       body: JSON.stringify({ tracks: tracks })
-    });
-    console.log(tracks);
-    let url: string = `${this.BASE_URL}/userId/${user.id}/playlists/${id}/tracks`;
-    return this.http.delete(url,{ headers: headers}).map((response: Response) => {
+    let user = this.authenticationService.getUser();
+    let body:any = {};
+    body.id = user.id;
+    body.access_token = user.access_token;
+    body.refresh_token = user.refresh_token;
+    body.tracks = tracks;
+    let url: string = `${this.BASE_URL}/${id}/tracks`;
+    return this.http.delete(url,{ headers: this.getHeaders(user,body)}).map((response: Response) => {
       try {
         return response.json() || response.status;
       } catch (e) {
@@ -54,14 +62,13 @@ export class PlaylistsService {
     });
   }
 
-
-    getHeaders(){
-      let token = JSON.parse(localStorage.getItem('user')).token;
-      let headers: Headers = new Headers({
-        'Content-Type': 'application/json',
-         Authorization: `Bearer ${token}`
-      });
-      return headers;
-    }
+  getHeaders(user:any,body:any){
+    let headers: Headers = new Headers({
+      'Content-Type': 'application/json',
+       Authorization: `Bearer ${user.token}`,
+       body: JSON.stringify(body)
+    });
+    return headers;
+  }
 
 }
