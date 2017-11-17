@@ -13,13 +13,14 @@
         <a class="nav-link" routerLink="/playlists" routerLinkActive="active">Playlist</a>
       </li>
       <li class="nav-item" *ngIf="!getUser()">
-        <a class="nav-link"  href="http://localhost:3000/v1/auth/authorize">Log in</a>
+        <a class="nav-link" (click)="login()">Log in</a>
       </li>
     </ul>
     <div class="my-2 my-lg-0" *ngIf="getUser()">
       <div class="btn-group">
         <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          {{getUser().display_name}}
+          <ng-container *ngIf="getUser().display_name !=''">{{getUser().display_name}}</ng-container>
+          <ng-container *ngIf="getUser().display_name ==''">{{getUser().id}}</ng-container>
         </button>
         <div class="dropdown-menu dropdown-menu-left">
           <button class="dropdown-item" type="button" routerLink="/profile">Perfil</button>

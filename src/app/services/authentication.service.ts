@@ -1,36 +1,49 @@
-import { Injectable } from '@angular/core';
-import { Http, Headers, RequestOptions, Response } from '@angular/http';
-import {Observable} from 'rxjs/Observable';
-import 'rxjs/Rx';
+import { Injectable,OnInit} from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { Subject }    from 'rxjs/Subject';
+import { HttpClient,HttpHeaders,HttpRequest } from '@angular/common/http';
+import { UsersService } from './users.service';
+import { SocketService } from './socket.service';
 
 @Injectable()
 export class AuthenticationService {
 
-  constructor(public http: Http,public router:Router) { }
+  private BASE_URL: string = 'http://localhost:3000/v1/auth';
 
-  login(user:any){
-    this.setUser(user);
+  constructor(
+    public http: HttpClient,
+    public router:Router,
+    public usersService:UsersService,
+    public socketService:SocketService) {
+
+    }
+
+  ngOnInit(){
+
+  }
+
+  login(token:any){
+    localStorage.setItem('token',token);
+    this.socketService.connect();
+    this.usersService.getProfile().subscribe((data:any)=>{
+      localStorage.setItem('user',JSON.stringify(data));
+    },(error:any)=>{
+      console.log(error);
+    });
     this.router.navigate(['/home']);
   }
 
-  setUser(user:any){
-    localStorage.setItem('user',JSON.stringify(user));
-  }
-
   logOut(){
-    localStorage.removeItem('user');
+    localStorage.clear();
+    this.socketService.close();
     this.router.navigate(['/home']);
   }
 
   getUser(){
-    let user = localStorage.getItem('user');
-    if(user){
-      return JSON.parse(user);
-    }else{
-      return undefined;
-    }
+    return JSON.parse(localStorage.getItem('user'));
+  }
+
+  setUser(user:any){
+    localStorage.setItem('user',JSON.stringify(user));
   }
 
 }

@@ -13,6 +13,11 @@ export class HeaderComponent implements OnInit {
   ngOnInit() {
   }
 
+  login(){
+    sessionStorage.setItem('state','spotifyApi');
+    window.location.href = 'http://localhost:3000/v1/auth/authorize'; 
+  }
+
   logOut(){
     this.authenticationService.logOut();
   }

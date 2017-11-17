@@ -3,7 +3,7 @@
     <div class="card-body">
       <h4 class="card-title">Mi perfil</h4>
       <div class="card-body">
-        <div *ngIf="(user.access_token || user.refresh_token)">
+        <div>
           <div class="form-group">
             <label>id</label>
             <input type="text"  readonly class="form-control"  [(ngModel)]="user.id" #ctrl="ngModel" required placeholder="Enter your first name">

@@ -20,17 +20,10 @@ export class CallbackComponent implements OnInit {
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
-      if(params){
-        this.usersService.verifyProfile(params).subscribe(data => {
-           if(data.error == false){
-             console.log(data);
-             this.authenticationService.login(params);
-           }else{
-             this.router.navigate(["/restricted"]);
-           }
-        }, error => {
-
-        });
+      if(params.token && params.state && sessionStorage.getItem('state') &&  params.state == sessionStorage.getItem('state')){
+        this.authenticationService.login(params.token);
+      }else{
+        this.router.navigate(["/restricted"]);
       }
     });
   }

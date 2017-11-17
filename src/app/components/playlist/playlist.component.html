@@ -1,35 +1,30 @@
-<div *ngIf="playlist" class="row justify-content-md-center justify-content-sm-center">
-  <div class="card col-sm-10">
+<div  class="row justify-content-md-center justify-content-sm-center">
+  <div *ngIf="error" class="col-sm-8">
+      <div *ngIf="error.status == 503">
+          {{ error.message }}
+      </div>
+  </div>
+  <div  *ngIf="playlist" class="card col-sm-10">
     <div class="card-body">
       <div class="row">
-        <div class="col-sm-4">
-           <img [src]="playlist.images[0].url" class="img-fluid img-thumbnail"/>
-           <h4 style="text-align:center">{{playlist.name}}</h4>
-           <p style="text-align:center">De {{playlist.owner.display_name}}</p>
-           <p style="text-align:center">{{playlist.tracks.total}} canciones</p>
-           <button *ngIf="getAllRepeated().length > 0" (click)="removeRepeatedsTracks()" type="button" class="btn btn-danger">Eliminar canciones repetidas</button>
-        </div>
         <div class="col-sm-8">
           <div class="list-group">
-            <div class="list-group-item  flex-column align-items-start" [ngClass]="isRepeated(item)? 'text-danger' : ''" *ngFor="let item of playlist.tracks.items;let i = index">
+            <div class="list-group-item  flex-column align-items-start" [ngClass]="item.repeated? 'text-danger' : ''" *ngFor="let item of playlist.tracks.items;let i = index">
               <div class="row" style="text-align:center">
               <div class="col-sm-12">
-                 <h4>{{i+1}}-{{item.track.name}}</h4>
+                 <h5>{{item.position + 1}}-{{item.track.name}}</h5>
               </div>
-              <div class="col-sm-12">
+              <div class="col-sm-8">
                 <ng-container *ngFor="let artist of item.track.artists;let i = index">
                   <p class="mb-1">{{artist.name}} </p>
                   <p *ngIf="i != 0" class="mb-1">,</p>
                 </ng-container>
                 <p> - {{item.track.album.name}}</p>
               </div>
-              <div class="col-sm-10">
-                <iframe [src]="sanitizer.bypassSecurityTrustResourceUrl('https://open.spotify.com/embed?uri='+item.track.uri)" frameborder="0" allowtransparency="true" width="100%" height="80"></iframe>
-              </div>
               <div class="col-sm-2">
-                <a (click)="removeTrack(item,i)" class="btn btn-danger" style="color:white">
+                <button (click)="removeTrack(item)" [disabled]="loading" class="btn btn-danger" style="color:white">
                   <i class="fa fa-trash" aria-hidden="true"></i>
-                </a>
+                </button>
               </div>
 
             </div>

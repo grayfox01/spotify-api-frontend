@@ -3,8 +3,10 @@ import { PlaylistsService } from './../../services/playlists.service';
 import { ActivatedRoute } from '@angular/router';
 import { DomSanitizer } from '@angular/platform-browser';
 import { UsersService } from './../../services/users.service';
+import { SocketService } from './../../services/socket.service';
 import { AuthenticationService } from './../../services/authentication.service';
-
+import { HttpEventType,HttpResponse} from '@angular/common/http';
+import { NgProgress } from 'ngx-progressbar';
 
 @Component({
   selector: 'app-playlist',
@@ -14,112 +16,70 @@ import { AuthenticationService } from './../../services/authentication.service';
 export class PlaylistComponent implements OnInit {
 
     public playlist:any;
-
+    public tracks = [];
+    public repeateds = [];
+    public loading:boolean = false;
+    public error:any;
     constructor(
       public playlistsService:PlaylistsService,
       private route: ActivatedRoute,
       public sanitizer: DomSanitizer,
       private usersService: UsersService,
-      private authenticationService:AuthenticationService
+      private authenticationService:AuthenticationService,
+      public ngProgress: NgProgress,
+      private socketService:SocketService
     ) { }
 
     ngOnInit() {
-      this.playlistsService.getId(this.route.snapshot.paramMap.get('id')).subscribe(data=>{
-        if(data.refresh_user){
-          this.usersService.getProfile().subscribe(data=>{
-            this.authenticationService.setUser(data.data);
-          });
+
+      this.init();
+      this.socketService.getEvent("refresh_playlist").subscribe((data:any)=>{
+        if(this.playlist && data.id == this.playlist.id && this.loading == false){
+          this.init();
         }
-        this.playlist = data.data;
-      },error=>{
-        console.log(error);
       });
     }
 
-    isRepeated(item:any){
-      let size = 0;
-      for (let i in this.playlist.tracks.items) {
-        let itemC = this.playlist.tracks.items[i];
-        if(item.track.id == itemC.track.id){
-          size = size + 1;
+    init(){
+      this.ngProgress.start();
+      this.loading = true;
+      this.playlistsService.getId(this.route.snapshot.paramMap.get('id')).subscribe( event => {
+        if (event instanceof HttpResponse) {
+          let body:any = event.body;
+            this.ngProgress.done();
+            this.loading = false;
+            this.playlist = event.body;
         }
-      }
-      return size > 1;
-    }
-
-    getReapeted(item){
-      let position = [];
-      for (let i in this.playlist.tracks.items) {
-        let itemC = this.playlist.tracks.items[i];
-        if(item.track.id == itemC.track.id){
-          position.push(Number(i));
-        }
-      }
-      if(position.length > 1){
-        position.splice(0,1);
-        return { "uri": item.track.uri, "positions": position };
-      }else{
-        return null;
-      }
-    }
-
-    getAllRepeated(){
-      let repeateds = [];
-      let copy  = Object.assign([], this.playlist.tracks.items);
-      while(copy.length > 0){
-         let search = this.getReapeted(copy[0]);
-         if( search != null){
-           repeateds.push(search);
-         }
-         //copy = copy.filter(function (itemC){return copy[0].track.id == itemC.track.id;});
-         for (let i in copy) {
-           if(copy[0].track.id == copy[i].track.id){
-              copy.splice(i,1);
-           }
-         }
-
-      }
-      return repeateds;
+      },error => {
+          this.ngProgress.done();
+          this.error = error.error;
+          this.loading = false;
+      });
     }
 
     removeRepeatedsTracks(){
-      this.playlistsService.removeRepeatedsTracks(this.playlist.id,this.getAllRepeated()).subscribe(data=>{
-        console.log(!data.error);
-        if(data.refresh_user){
-          this.usersService.getProfile().subscribe(data=>{
-            this.authenticationService.setUser(data.data);
-          });
+      this.playlistsService.removeRepeatedsTracks(this.playlist.id,this.playlist.snapshot_id,this.playlist.tracks.repeateds).subscribe(event=>{
+        if (event instanceof HttpResponse) {
+          let body:any = event.body;
+            this.ngProgress.done();
+            console.log(body);
         }
-        if(!data.error){
-          this.playlistsService.getId(this.route.snapshot.paramMap.get('id')).subscribe(data=>{
-            this.playlist = data.data;
-          },error=>{
-            console.log(error);
-          });
-        }
-      },error=>{
-        console.log(error);
-      })
+      },error => {
+          this.error = error.error;
+          this.loading = false;
+      });
     }
 
-    removeTrack(item:any,position:number){
-      this.playlistsService.removeRepeatedsTracks(this.playlist.id,[{ "uri": item.track.uri, "positions": [position] }]).subscribe(data=>{
-        if(data.refresh_user){
-          this.usersService.getProfile().subscribe(data=>{
-            this.authenticationService.setUser(data.data);
-          });
+    removeTrack(item:any){
+      this.playlistsService.removeRepeatedsTracks(this.playlist.id,this.playlist.snapshot_id,[item.position]).subscribe(event=>{
+        if (event instanceof HttpResponse) {
+            let body:any = event.body;
+            console.log(body);
         }
-        console.log(!data.error);
-        if(!data.error){
-          this.playlistsService.getId(this.route.snapshot.paramMap.get('id')).subscribe(data=>{
-            this.playlist = data.data;
-          },error=>{
-            console.log(error);
-          });
-        }
-      },error=>{
-        console.log(error);
-      })
+      },error => {
+          this.error = error.error;
+          this.loading = false;
+      });
     }
 
 }

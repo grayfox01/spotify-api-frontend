@@ -14,7 +14,7 @@ export class NotAuthenticatedGuard implements CanActivate {
   canActivate(
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
-      if (!this.authenticationService.getUser()) {
+      if (!localStorage.getItem('token')) {
         return true;
       } else {
         this.router.navigate(["/restricted"]);

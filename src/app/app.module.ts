@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule }   from '@angular/forms';
-import { HttpModule } from "@angular/http";
+import { HttpClientModule } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
 import { RoutingModule } from './modules/routing/routing.module';
@@ -20,10 +20,12 @@ import { CallbackComponent } from './components/callback/callback.component';
 import { AuthenticationService } from './services/authentication.service';
 import { UsersService } from './services/users.service';
 import { PlaylistsService } from './services/playlists.service';
-import { CookieService } from 'ngx-cookie-service';
+import { SocketService } from './services/socket.service';
 
 import { AuthenticatedGuard } from './guards/authenticated.guard';
 import { NotAuthenticatedGuard } from './guards/not-authenticated.guard';
+import { NgProgressModule } from 'ngx-progressbar';
+
 
 
 
@@ -45,15 +47,16 @@ import { NotAuthenticatedGuard } from './guards/not-authenticated.guard';
     BrowserModule,
     RoutingModule,
     FormsModule,
-    HttpModule
+    HttpClientModule,
+    NgProgressModule
   ],
   providers: [
     AuthenticationService,
     PlaylistsService,
     UsersService,
-    CookieService,
     AuthenticatedGuard,
-    NotAuthenticatedGuard
+    NotAuthenticatedGuard,
+    SocketService
   ],
   bootstrap: [AppComponent]
 })

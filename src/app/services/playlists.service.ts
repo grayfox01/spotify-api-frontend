@@ -1,73 +1,59 @@
 import { Injectable } from '@angular/core';
-import { Http, Headers, RequestOptions, Response } from '@angular/http';
-import {Observable} from 'rxjs/Observable';
-import 'rxjs/Rx';
-import { Router, ActivatedRoute } from '@angular/router';
-import { Subject }    from 'rxjs/Subject';
+import { Router} from '@angular/router';
+import { HttpClient,HttpHeaders,HttpRequest } from '@angular/common/http';
 import { AuthenticationService } from './authentication.service';
+
+import 'rxjs/add/operator/retry';
 
 @Injectable()
 export class PlaylistsService {
 
   private BASE_URL: string = 'http://localhost:3000/v1/playlists';
 
-  constructor(public http: Http,public router:Router,public authenticationService:AuthenticationService) { }
+  constructor(
+    public http: HttpClient,
+    public router:Router,
+    public authenticationService:AuthenticationService
+  ) { }
 
   getAll(){
-    let user = this.authenticationService.getUser();
-    let body:any = {};
-    body.id = user.id;
-    body.access_token = user.access_token;
-    body.refresh_token = user.refresh_token;
     let url: string = `${this.BASE_URL}`;
-    return this.http.get(url,{ headers: this.getHeaders(user,body)}).map((response: Response) => {
-      try {
-        return response.json() || response.status;
-      } catch (e) {
-        return response.status;
-      }
-    });
+    const req = new HttpRequest('GET',url, { headers: this.getHeaders(), reportProgress: true});
+    return this.http.request(req);
   }
 
   getId(id:string){
-    let user = this.authenticationService.getUser();
-    let body:any = {};
-    body.id = user.id;
-    body.access_token = user.access_token;
-    body.refresh_token = user.refresh_token;
     let url: string = `${this.BASE_URL}/${id}`;
-    return this.http.get(url,{ headers: this.getHeaders(user,body)}).map((response: Response) => {
-      try {
-        return response.json() || response.status;
-      } catch (e) {
-        return response.status;
-      }
-    });
+    const req = new HttpRequest('GET',url, { headers: this.getHeaders(), reportProgress: true});
+    return this.http.request(req);
   }
 
-  removeRepeatedsTracks(id,tracks:any){
-    let user = this.authenticationService.getUser();
-    let body:any = {};
-    body.id = user.id;
-    body.access_token = user.access_token;
-    body.refresh_token = user.refresh_token;
-    body.tracks = tracks;
+  getTracks(id){
     let url: string = `${this.BASE_URL}/${id}/tracks`;
-    return this.http.delete(url,{ headers: this.getHeaders(user,body)}).map((response: Response) => {
-      try {
-        return response.json() || response.status;
-      } catch (e) {
-        return response.status;
-      }
-    });
+    const req = new HttpRequest('GET',url, { headers: this.getHeaders(), reportProgress: true});
+    return this.http.request(req);
   }
 
-  getHeaders(user:any,body:any){
-    let headers: Headers = new Headers({
-      'Content-Type': 'application/json',
-       Authorization: `Bearer ${user.token}`,
-       body: JSON.stringify(body)
-    });
+  removeRepeatedsTracks(id,snapshot_id,positions:any){
+    let body = {
+      snapshot_id:snapshot_id,
+      positions : positions
+    };
+    let url: string = `${this.BASE_URL}/${id}/tracks`;
+    const req = new HttpRequest('DELETE',url, { headers: this.getHeaders(body), reportProgress: true});
+    return this.http.request(req);
+  }
+
+  getHeaders(body:any = undefined){
+    let headers;
+    if(body){
+      headers = new HttpHeaders().set('Authorization', `Bearer ${localStorage.getItem('token')}`)
+     .set('Content-Type', 'application/json')
+     .set('body', JSON.stringify(body));
+    }else{
+      headers = new HttpHeaders().set('Authorization', `Bearer ${localStorage.getItem('token')}`)
+     .set('Content-Type', 'application/json');
+    }
     return headers;
   }
 
